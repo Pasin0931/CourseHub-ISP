@@ -1,36 +1,67 @@
-## SETYP BACKEND .VENV
+# CourseHub
 
-You need to have python version 3.14.2 inside your machine, and it must able to be detected, then cd into /backend
+A platform that centralizes course tasks, announcements, and FAQs to keep lecturers and TAs in sync.
+
+## Prerequisites
+
+- **Python 3.14.2** (must be installed and detectable on your machine)
+- **Node.js** with npm
+
+---
+
+## Backend Setup
+
+### 1. Navigate to the backend folder
+
+```bash
+cd backend
+```
+
+### 2. Create and activate a virtual environment
 
 **Windows (PowerShell):**
 ```powershell
 python -m venv venv
 .\venv\Scripts\Activate.ps1
 ```
+
 **macOS / Linux:**
 ```bash
 /usr/bin/python3 -m venv venv
 source venv/bin/activate
 ```
 
-## Install dependencies
+### 3. Install dependencies
+
 ```bash
 pip install -r requirements.txt
 ```
 
-## HOW TO RUN
-# Frontend
-cd into coursehub (frontend) file then enter
-```bash
-npm i  # dependencies/shadcn ui installation
-```
-then
-```bash
-npm run dev  # run frontend file
-```
+### 4. Run the backend server
 
-# Backend
-cd into /backend then
 ```bash
 uvicorn main:app --reload
+```
+
+---
+
+## Frontend Setup
+
+### 1. Navigate to the frontend folder
+
+```bash
+cd coursehub
+```
+
+### 2. Install dependencies
+
+```bash
+npm i
+```
+> Installs project dependencies, including shadcn/ui components.
+
+### 3. Run the frontend
+
+```bash
+npm run dev
 ```
