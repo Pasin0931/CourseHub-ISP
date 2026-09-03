@@ -54,23 +54,29 @@ pipeline {
             }
         }
         stage('Deploy') {
-            agent any
-            when {
-                expression {
-                    return env.GIT_BRANCH == 'origin/main' || env.GIT_BRANCH == 'main'
-                }
-            }
-            steps {
-                // Jenkins and the app run on the same machine, so this builds
-                // fresh images from the checked-out source and restarts the
-                // stack in place. The Jenkins user needs access to the docker
-                // socket (usually: add it to the "docker" group).
-                sh '''
-                    docker compose build
-                    docker compose up -d --remove-orphans
-                '''
-            }
-        }
+			agent any
+			when {
+				expression {
+					return env.GIT_BRANCH == 'origin/main' || env.GIT_BRANCH == 'main'
+				}
+			}
+			steps {
+				withCredentials([
+					file(credentialsId: 'coursehub-backend-env', variable: 'BACKEND_ENV'),
+					file(credentialsId: 'coursehub-frontend-env', variable: 'FRONTEND_ENV')
+				]) {
+					sh '''
+						cp "$BACKEND_ENV" backend/.env
+						cp "$FRONTEND_ENV" coursehub/.env
+
+						docker compose build
+						docker compose up -d --remove-orphans
+
+						rm -f backend/.env coursehub/.env
+					'''
+				}
+			}
+		}
     }
     post {
         always {
