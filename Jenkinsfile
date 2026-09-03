@@ -55,7 +55,11 @@ pipeline {
         }
         stage('Deploy') {
             agent any
-            when { branch 'main' }
+            when {
+                expression {
+                    return env.GIT_BRANCH == 'origin/main' || env.GIT_BRANCH == 'main'
+                }
+            }
             steps {
                 // Jenkins and the app run on the same machine, so this builds
                 // fresh images from the checked-out source and restarts the
