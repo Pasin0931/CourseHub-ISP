@@ -1,0 +1,32 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: coursehub-backend
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    networks:
+      - coursehub-net
+
+  frontend:
+    build:
+      context: ./coursehub
+      dockerfile: Dockerfile
+      args:
+        NODE_VERSION: 24.14.0
+    container_name: coursehub-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://backend:8000
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - coursehub-net
+
+networks:
+  coursehub-net:
+    driver: bridge
