@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 
-import LandingPage from "@/components/landingpage"
+import LandingPage from "@/components/landing"
 
 export default function Home() {
     return (
