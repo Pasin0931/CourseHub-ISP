@@ -1,11 +1,10 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
+import { Loader } from "lucide-react"
 
-import {Loader} from "lucide-react"
-
-export default function AuthSuccessPage() {
+function AuthSuccessContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -14,7 +13,6 @@ export default function AuthSuccessPage() {
 
     if (token) {
       localStorage.setItem("access_token", token)
-    //   alert("redicting")
       router.replace("/courses")
     } else {
       router.replace("/?error=missing_token")
@@ -25,5 +23,19 @@ export default function AuthSuccessPage() {
     <div className="flex items-center justify-center h-screen">
       <Loader className="animate-spin" />
     </div>
+  )
+}
+
+export default function AuthSuccessPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center h-screen">
+          <Loader className="animate-spin" />
+        </div>
+      }
+    >
+      <AuthSuccessContent />
+    </Suspense>
   )
 }
