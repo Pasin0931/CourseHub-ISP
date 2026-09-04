@@ -10,7 +10,7 @@ import { FcGoogle } from "react-icons/fc"
 export default function LandingPage() {
     const handle_submit = () => {
         try {
-            window.location.href = "/api/auth"
+            window.location.href = "/api_auth/auth"
         }
         catch (error) {
             alert("Error while trting to login")
