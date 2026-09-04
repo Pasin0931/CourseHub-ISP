@@ -20,7 +20,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - NEXT_PUBLIC_API_URL=https://coursehub.user-notexist.com/api
+      - NEXT_PUBLIC_API_URL=http://backend:8000
     depends_on:
       - backend
     restart: unless-stopped
