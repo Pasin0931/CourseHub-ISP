@@ -52,7 +52,7 @@ async def auth_callback(request: Request, db: Session = Depends(get_db)):
     try:
         token = await oauth.google.authorize_access_token(request)
     except Exception:
-        raise HTTPException(status_code=400, detail="OAuth authorization failed")
+        raise HTTPException(status_code=400, detail="OAuth authorization failed") # ---------
 
     userinfo = token.get("userinfo")
     if not userinfo:
