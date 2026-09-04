@@ -12,7 +12,17 @@ pipeline {
         stage('Checkout') {
             agent any
             steps {
+                githubNotify context: 'Jenkins/Checkout', description: 'Checking out source...', status: 'PENDING'
                 checkout scm
+                githubNotify context: 'Jenkins/Checkout', description: 'Checkout complete.', status: 'SUCCESS'
+            }
+            post {
+                failure {
+                    githubNotify context: 'Jenkins/Checkout', description: 'Checkout failed.', status: 'FAILURE'
+                }
+                aborted {
+                    githubNotify context: 'Jenkins/Checkout', description: 'Checkout aborted.', status: 'ERROR'
+                }
             }
         }
         stage('Backend: install & test') {
@@ -27,6 +37,7 @@ pipeline {
                 }
             }
             steps {
+                githubNotify context: 'Jenkins/Backend', description: 'Installing & testing backend...', status: 'PENDING'
                 sh '''
                     pip install --no-cache-dir -r requirements.txt
                     cd backend
@@ -34,6 +45,15 @@ pipeline {
                     pip install --no-cache-dir pytest
                     python -m pytest --maxfail=1 || true
                 '''
+                githubNotify context: 'Jenkins/Backend', description: 'Backend install & test passed.', status: 'SUCCESS'
+            }
+            post {
+                failure {
+                    githubNotify context: 'Jenkins/Backend', description: 'Backend install & test failed.', status: 'FAILURE'
+                }
+                aborted {
+                    githubNotify context: 'Jenkins/Backend', description: 'Backend stage aborted.', status: 'ERROR'
+                }
             }
         }
         stage('Frontend: install, lint & build') {
@@ -44,6 +64,7 @@ pipeline {
                 }
             }
             steps {
+                githubNotify context: 'Jenkins/Frontend', description: 'Installing, linting & building frontend...', status: 'PENDING'
                 dir('coursehub') {
                     sh '''
                         npm ci
@@ -51,32 +72,51 @@ pipeline {
                         npm run build
                     '''
                 }
+                githubNotify context: 'Jenkins/Frontend', description: 'Frontend build passed.', status: 'SUCCESS'
+            }
+            post {
+                failure {
+                    githubNotify context: 'Jenkins/Frontend', description: 'Frontend build failed.', status: 'FAILURE'
+                }
+                aborted {
+                    githubNotify context: 'Jenkins/Frontend', description: 'Frontend stage aborted.', status: 'ERROR'
+                }
             }
         }
         stage('Deploy') {
-			agent any
-			when {
-				expression {
-					return env.GIT_BRANCH == 'origin/main' || env.GIT_BRANCH == 'main'
-				}
-			}
-			steps {
-				withCredentials([
-					file(credentialsId: 'coursehub-backend-env', variable: 'BACKEND_ENV'),
-					file(credentialsId: 'coursehub-frontend-env', variable: 'FRONTEND_ENV')
-				]) {
-					sh '''
-						cp "$BACKEND_ENV" backend/.env
-						cp "$FRONTEND_ENV" coursehub/.env
+            agent any
+            when {
+                expression {
+                    return env.GIT_BRANCH == 'origin/main' || env.GIT_BRANCH == 'main'
+                }
+            }
+            steps {
+                githubNotify context: 'Jenkins/Deployment', description: 'Deployment in progress...', status: 'PENDING'
 
-						docker compose build
-						docker compose up -d --remove-orphans
+                withCredentials([
+                    file(credentialsId: 'coursehub-backend-env', variable: 'BACKEND_ENV'),
+                    file(credentialsId: 'coursehub-frontend-env', variable: 'FRONTEND_ENV')
+                ]) {
+                    sh '''
+                        cp "$BACKEND_ENV" backend/.env
+                        cp "$FRONTEND_ENV" coursehub/.env
+                        docker compose build
+                        docker compose up -d --remove-orphans
+                        rm -f backend/.env coursehub/.env
+                    '''
+                }
 
-						rm -f backend/.env coursehub/.env
-					'''
-				}
-			}
-		}
+                githubNotify context: 'Jenkins/Deployment', description: 'Deployment passed!', status: 'SUCCESS'
+            }
+            post {
+                failure {
+                    githubNotify context: 'Jenkins/Deployment', description: 'Deployment failed.', status: 'FAILURE'
+                }
+                aborted {
+                    githubNotify context: 'Jenkins/Deployment', description: 'Deployment aborted.', status: 'ERROR'
+                }
+            }
+        }
     }
     post {
         always {
@@ -89,6 +129,9 @@ pipeline {
         }
         success {
             echo "Build ${env.BUILD_NUMBER} succeeded on branch ${env.BRANCH_NAME ?: 'unknown'}."
+        }
+        aborted {
+            echo 'Pipeline aborted'
         }
     }
 }
