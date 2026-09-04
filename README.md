@@ -5,7 +5,7 @@ A platform that centralizes course tasks, announcements, and FAQs to keep lectur
 ## Prerequisites
 
 - **Python 3.14.2** (must be installed and detectable on your machine)
-- **Node.js** with npm
+- **Node.js** with npm (Node version v24.14.0)
 
 ---
 
@@ -19,13 +19,13 @@ cd backend
 
 ### 2. Create and activate a virtual environment
 
-**Windows (PowerShell):**
+**Windows (PowerShell):** (OR USE YOUR PATH TO PYTHON FILE)
 ```powershell
 python -m venv venv
 .\venv\Scripts\Activate.ps1
 ```
 
-**macOS / Linux:**
+**macOS / Linux:** (OR USE YOUR PATH TO PYTHON FILE)
 ```bash
 /usr/bin/python3 -m venv venv
 source venv/bin/activate
@@ -40,7 +40,7 @@ pip install -r requirements.txt
 ### 4. Run the backend server
 
 ```bash
-uvicorn main:app --reload
+python -m uvicorn main:app --reload
 ```
 
 ---
@@ -64,4 +64,9 @@ npm i
 
 ```bash
 npm run dev
+```
+
+### Checking your venv deps
+```bash
+pip list
 ```

@@ -1,3 +1,11 @@
 fastapi
 uvicorn
 sqlalchemy
+httpx
+dotenv
+psycopg2-binary # behind the scene of sqalchemy
+
+# authentication
+authlib
+itsdangerous
+python-jose
